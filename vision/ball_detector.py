@@ -1,41 +1,32 @@
-import cv2
-import numpy as np
+from ultralytics import YOLO
 
 import core.config as config
 from utils.drawing import circle
 
-
 class BallDetector:
-    LOWER_ORANGE = np.array([5, 100, 100])
-    UPPER_ORANGE = np.array([20, 255, 255])
-
     def __init__(self):
+        self.model = YOLO(config.YOLO_MODEL_PATH)
         self.position = None
 
 
     def process(self, frame):
         self.position = None
 
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(hsv, self.LOWER_ORANGE, self.UPPER_ORANGE)
+        results = self.model.predict(
+            frame,
+            classes=[config.BALL_CLASS_ID],
+            conf=config.YOLO_CONFIDENCE,
+            verbose=False
+        )[0]
 
-        mask = cv2.erode(mask, None, iterations=2)
-        mask = cv2.dilate(mask, None, iterations=2)
+        if len(results.boxes):
+            box = max(results.boxes, key=lambda b: float(b.conf))
 
-        contours, _ = cv2.findContours(
-            mask,
-            cv2.RETR_EXTERNAL,
-            cv2.CHAIN_APPROX_SIMPLE
-        )
+            x1, y1, x2, y2 = box.xyxy[0].tolist()
 
-        if contours:
-            largest = max(contours, key=cv2.contourArea)
+            self.position = (int((x1 + x2) / 2), int((y1 + y2) / 2))
+            radius = int(max(x2 - x1, y2 - y1) / 2)
 
-            (x, y), radius = cv2.minEnclosingCircle(largest)
-
-            if config.BALL_MIN_RADIUS <= radius <= config.BALL_MAX_RADIUS:
-                self.position = (int(x), int(y))
-
-                circle(frame, self.position, int(radius))
+            circle(frame, self.position, radius)
 
         return frame

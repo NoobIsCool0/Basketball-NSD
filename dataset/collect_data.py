@@ -3,7 +3,7 @@ import os
 
 import cv2
 
-import core.config as config
+import core.config as config  # noqa: PLR0402
 from features.extract_features import extract
 from utils.drawing import text
 from utils.fps import FPSCounter

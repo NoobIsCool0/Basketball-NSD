@@ -1,21 +1,17 @@
 import cv2
 
-import core.config as config
-
-from vision.camera import Camera
-from vision.pose_detector import PoseDetector
-from vision.ball_detector import BallDetector
-from vision.tracker import Tracker
-
+import core.config as config  # noqa: PLR0402
 from features.extract_features import extract
-
-from models.predictor import Predictor
-
 from feedback.feedback import generate
 from feedback.overlay import draw_prediction, draw_tips
-
+from models.predictor import Predictor
 from utils.fps import FPSCounter
 from utils.logger import Logger
+from vision.ball_detector import BallDetector
+from vision.camera import Camera
+from vision.pose_detector import PoseDetector
+from vision.tracker import Tracker
+
 
 def is_rising(positions):
     if len(positions) < 3:

@@ -1,15 +1,15 @@
 import joblib
 import pandas as pd
-
 from sklearn.metrics import (
     accuracy_score,
+    confusion_matrix,
+    f1_score,
     precision_score,
     recall_score,
-    f1_score,
-    confusion_matrix
 )
 
 from core.config import MODEL_PATH
+
 
 def evaluate(csv_path):
     df = pd.read_csv(csv_path)

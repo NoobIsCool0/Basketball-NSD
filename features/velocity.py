@@ -1,5 +1,6 @@
 from utils.helpers import distance
 
+
 def average_speed(positions):
     if len(positions) < 2:
         return 0

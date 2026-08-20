@@ -16,9 +16,20 @@ BLUE = (255, 0, 0)
 WHITE = (255, 255, 255)
 YELLOW = (0, 255, 255)
 
+# Pose
+POSE_MODEL_PATH = "assets/models/pose_landmarker_lite.task"
+
 # Ball Detection
-BALL_MIN_RADIUS = 8
-BALL_MAX_RADIUS = 80
+YOLO_MODEL_PATH = "assets/models/basketball_yolo11n_v2.pt"
+YOLO_CONFIDENCE = 0.4
+BALL_CLASS_ID = 0  # fine-tuned single-class model. Was 32 (COCO "sports ball") for stock yolo11n.pt.
+
+# Ball Detector Fine-Tuning
+BALL_FRAMES_DIR = "dataset/ball_frames"
+BALL_DATASET_YAML = "assets/dataset/data.yaml"
+YOLO_EPOCHS = 50
+YOLO_IMG_SIZE = 512
+
 
 # Motion
 VELOCITY_HISTORY = 5

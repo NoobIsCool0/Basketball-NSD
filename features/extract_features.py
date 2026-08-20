@@ -1,11 +1,11 @@
 import math
 
 from features.angles import angle
-from features.velocity import average_speed
-from features.trajectory import arc_height, entry_angle
 from features.normalize import scale
-
+from features.trajectory import arc_height, entry_angle
+from features.velocity import average_speed
 from utils.helpers import distance
+
 
 def extract(landmarks, ball_trajectory, frame_width, frame_height):
     if not landmarks or len(ball_trajectory) < 2:

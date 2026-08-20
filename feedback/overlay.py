@@ -1,5 +1,6 @@
-import core.config as config
+import core.config as config  # noqa: PLR0402
 from utils.drawing import text
+
 
 def draw_prediction(frame, prediction_result):
     label = "MADE" if prediction_result.prediction else "MISSED"

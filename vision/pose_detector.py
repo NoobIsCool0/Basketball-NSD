@@ -1,33 +1,60 @@
+import time
+
 import cv2
 import mediapipe as mp
 
+from mediapipe.tasks import python as mp_python
+from mediapipe.tasks.python import vision as mp_vision
+
+import core.config as config
+from utils.drawing import circle
+
+LANDMARK_NAMES = [
+    "NOSE", "LEFT_EYE_INNER", "LEFT_EYE", "LEFT_EYE_OUTER",
+    "RIGHT_EYE_INNER", "RIGHT_EYE", "RIGHT_EYE_OUTER",
+    "LEFT_EAR", "RIGHT_EAR", "MOUTH_LEFT", "MOUTH_RIGHT",
+    "LEFT_SHOULDER", "RIGHT_SHOULDER", "LEFT_ELBOW", "RIGHT_ELBOW",
+    "LEFT_WRIST", "RIGHT_WRIST", "LEFT_PINKY", "RIGHT_PINKY",
+    "LEFT_INDEX", "RIGHT_INDEX", "LEFT_THUMB", "RIGHT_THUMB",
+    "LEFT_HIP", "RIGHT_HIP", "LEFT_KNEE", "RIGHT_KNEE",
+    "LEFT_ANKLE", "RIGHT_ANKLE", "LEFT_HEEL", "RIGHT_HEEL",
+    "LEFT_FOOT_INDEX", "RIGHT_FOOT_INDEX"
+]
 
 class PoseDetector:
     def __init__(self):
-        self.mp_pose = mp.solutions.pose
-        self.mp_drawing = mp.solutions.drawing_utils
-
-        self.pose = self.mp_pose.Pose(
-            min_detection_confidence=0.5,
-            min_tracking_confidence=0.5
+        options = mp_vision.PoseLandmarkerOptions(
+            base_options=mp_python.BaseOptions(
+                model_asset_path=config.POSE_MODEL_PATH
+            ),
+            running_mode=mp_vision.RunningMode.VIDEO
         )
+
+        self.landmarker = mp_vision.PoseLandmarker.create_from_options(options)
+        self.start_time = time.time()
 
         self.landmarks = None
 
 
     def process(self, frame):
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
 
-        results = self.pose.process(rgb)
+        timestamp_ms = int((time.time() - self.start_time) * 1000)
 
-        self.landmarks = results.pose_landmarks
+        result = self.landmarker.detect_for_video(image, timestamp_ms)
+
+        self.landmarks = result.pose_landmarks[0] if result.pose_landmarks else None
 
         if self.landmarks:
-            self.mp_drawing.draw_landmarks(
-                frame,
-                self.landmarks,
-                self.mp_pose.POSE_CONNECTIONS
-            )
+            height, width = frame.shape[:2]
+
+            for landmark in self.landmarks:
+                circle(
+                    frame,
+                    (int(landmark.x * width), int(landmark.y * height)),
+                    3
+                )
 
         return frame
 
@@ -37,9 +64,9 @@ class PoseDetector:
             return None
 
         return {
-            landmark.name: (
-                self.landmarks.landmark[landmark.value].x * frame_width,
-                self.landmarks.landmark[landmark.value].y * frame_height
+            name: (
+                self.landmarks[i].x * frame_width,
+                self.landmarks[i].y * frame_height
             )
-            for landmark in self.mp_pose.PoseLandmark
+            for i, name in enumerate(LANDMARK_NAMES)
         }

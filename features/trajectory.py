@@ -1,5 +1,6 @@
 import math
 
+
 def arc_height(positions):
     if not positions:
         return 0

@@ -1,4 +1,5 @@
-import core.config as config
+import core.config as config  # noqa: PLR0402
+
 
 def elbow_feedback(elbow_angle):
     low, high = config.IDEAL_ELBOW_ANGLE

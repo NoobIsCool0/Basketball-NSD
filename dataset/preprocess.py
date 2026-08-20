@@ -1,6 +1,7 @@
 import pandas as pd
 
-import core.config as config
+import core.config as config  # noqa: PLR0402
+
 
 def preprocess(csv_path):
     df = pd.read_csv(csv_path)
